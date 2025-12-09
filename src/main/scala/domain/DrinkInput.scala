@@ -5,7 +5,7 @@ import scala.util.Try
 
 object DrinkInput {
 
-  // Главный метод: читаем напиток из потока 
+  // Главный метод: читаем напиток из потока
   def readDrink(in: LazyList[String]): (Option[Drink], LazyList[String]) = {
     // Шаг 1: Читаем тип напитка
     val (typeNumOpt, rest1) = readValidNumber(in, 1, 4, "тип напитка")
@@ -37,7 +37,7 @@ object DrinkInput {
     (Some(drink), rest3)
   }
 
-  // Вспомогательный метод: читает валидное число 
+  // Вспомогательный метод: читает валидное число
   private def readValidNumber(
                                stream: LazyList[String],
                                min: Int,
@@ -45,7 +45,7 @@ object DrinkInput {
                                fieldName: String
                              ): (Option[Int], LazyList[String]) = {
 
-    // Пропускаем не-числа 
+    // Пропускаем не-числа
     val validStream = stream.dropWhile(s => Try(s.toInt).isFailure)
 
     if (validStream.isEmpty) {

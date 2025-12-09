@@ -13,13 +13,13 @@ object Input {
 
   type Result[T] = (T, LazyList[String])
 
-  // Чтение с подсказкой
+  // Чтение с подсказкой - ТОЛЬКО если нужно
   def readWithPrompt(prompt: String): LazyList[String] = {
-    print(prompt)
+    if (prompt.nonEmpty) print(prompt)
     stream
   }
 
-  // Чтение числа 
+  // Чтение числа
   def readInt(stream: LazyList[String]): (Option[Int], LazyList[String]) = {
     if (stream.isEmpty) {
       return (None, stream)
@@ -29,9 +29,7 @@ object Input {
 
     Try(line.toInt).toOption match {
       case Some(num) => (Some(num), rest)
-      case None =>
-        println("Ожидается число")
-        readInt(rest)
+      case None => (None, rest)
     }
   }
 }

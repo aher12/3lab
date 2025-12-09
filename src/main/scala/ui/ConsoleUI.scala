@@ -4,6 +4,7 @@ import domain.{Brand, Drink, DrinkType, Menu, DrinkInput}
 import service.{MenuService, PriceCalculator}
 import io.Input
 import scala.collection.immutable.LazyList
+import scala.util.Try
 
 object ConsoleUI {
 
@@ -152,28 +153,25 @@ object ConsoleUI {
       return currentMenu
     }
 
-    displayMenu(currentMenu)
+    // НЕ показываем меню здесь!
+    print("\nВведите номер напитка для удаления: ")
+    val input = scala.io.StdIn.readLine()
 
-    val inputStream = Input.readWithPrompt("\nВведите номер напитка для удаления: ")
-    val (numOpt, _) = Input.readInt(inputStream)
+    scala.util.Try(input.toInt).toOption match {
+      case Some(index) if index >= 1 && index <= currentMenu.size =>
+        val newDrinks = currentMenu.drinks.patch(index - 1, Nil, 1)
+        println(s"Напиток №$index удален")
+        Menu(newDrinks)
 
-    if (numOpt.isEmpty) {
-      println("Неверный номер")
-      return currentMenu
+      case Some(index) =>
+        println(s"Номер должен быть от 1 до ${currentMenu.size}")
+        currentMenu
+
+      case None =>
+        println("Неверный номер")
+        currentMenu
     }
-
-    val index = numOpt.get
-
-    if (index < 1 || index > currentMenu.size) {
-      println(s"Номер должен быть от 1 до ${currentMenu.size}")
-      return currentMenu
-    }
-
-    val newDrinks = currentMenu.drinks.patch(index - 1, Nil, 1)
-    println(s"Напиток №$index удален")
-    Menu(newDrinks)
   }
-
   private def handleFilterByType(currentMenu: Menu): Menu = {
     println("\n" + "=" * 40)
     println("ФИЛЬТРАЦИЯ ПО ТИПУ (только просмотр)")

@@ -38,33 +38,41 @@ object Main extends App {
   ConsoleUI.displayMenu(initialMenu)
   ConsoleUI.showCommands()
 
-  // Основной цикл с ленивым потоком команд
+  // Основной цикл
   def runWithLazyStream(startMenu: Menu): Menu = {
-    var currentMenu = startMenu
-
-    // Ленивый поток команд
-    val commandStream = InputParser.commandStream
-
-    // Обработка команд
-    def processCommands(stream: LazyList[String], menu: Menu): Menu = {
-      if (stream.isEmpty) {
-        return menu
-      }
-
-      val (cmdNum, rest) = InputParser.parseCommand(stream)
-
-      if (cmdNum == 8) {
-        return menu
-      }
-
-      val newMenu = ConsoleUI.processChoice(cmdNum.toString, menu)
-      processCommands(rest, newMenu)
+    // Создаем поток ввода ВРУЧНУЮ
+    def inputStream: LazyList[String] = {
+      print("\nВведите команду (1-8): ")
+      scala.io.StdIn.readLine().trim #:: inputStream
     }
 
-    processCommands(commandStream, currentMenu)
+    @annotation.tailrec
+    def loop(menu: Menu, stream: LazyList[String]): Menu = {
+      if (stream.isEmpty) return menu
+
+      val cmd #:: rest = stream
+
+      cmd match {
+        case "8" =>
+          println("\nЗавершение работы...")
+          menu
+
+        case cmd if "1234567".contains(cmd) =>
+          val newMenu = ConsoleUI.processChoice(cmd, menu)
+          loop(newMenu, inputStream) // Берем НОВЫЙ поток!
+
+        case _ =>
+          println("Неверная команда. Введите число от 1 до 8")
+          loop(menu, inputStream) // Берем НОВЫЙ поток!
+      }
+    }
+
+    loop(startMenu, inputStream)
   }
 
-  val finalMenu = runWithLazyStream(initialMenu)
+  // Выбирай что хочешь:
+  // val finalMenu = runWithSimpleLoop(initialMenu)      // Простой вариант
+  val finalMenu = runWithLazyStream(initialMenu) // С LazyList
 
   // Финальный вывод
   println("\n" + "=" * 60)
