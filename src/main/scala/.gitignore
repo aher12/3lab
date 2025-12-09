@@ -1,0 +1,22 @@
+# IntelliJ IDEA
+.idea/
+*.iml
+out/
+target/
+
+# Scala
+.metals/
+.bloop/
+project/project/
+project/target/
+
+# SBT
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+
+# macOS
+.DS_Store
